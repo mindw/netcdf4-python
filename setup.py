@@ -93,7 +93,7 @@ def getnetcdfvers(libdirs):
     import os, re, sys, ctypes
 
     if sys.platform.startswith('win'):
-        regexp = re.compile('^netcdf.dll$')
+        regexp = re.compile('^netcdf.*\.dll$')
     elif sys.platform.startswith('cygwin'):
         bindirs = []
         for d in libdirs:
@@ -282,7 +282,7 @@ NETCDF4_DIR environment variable not set, checking standard locations.. \n""")
     if netCDF4_libdir is None and netCDF4_dir is not None:
         netCDF4_libdir = os.path.join(netCDF4_dir, 'lib')
 
-    libs = ['netcdf','hdf5_hl','hdf5','z']
+    libs = ['netcdf','hdf5_hl','hdf5','zlib.dll']
     lib_dirs = [netCDF4_libdir,HDF5_libdir]
     inc_dirs = [netCDF4_incdir,HDF5_incdir]
 
@@ -292,7 +292,7 @@ NETCDF4_DIR environment variable not set, checking standard locations.. \n""")
     if szip_incdir is None and szip_dir is not None:
         szip_incdir = os.path.join(szip_dir, 'include')
     if szip_incdir is not None and szip_libdir is not None:
-        libs.append('sz')
+        libs.append('szip')
         lib_dirs.append(szip_libdir)
         inc_dirs.append(szip_incdir)
     # add hdf4 to link if desired.
@@ -320,9 +320,16 @@ NETCDF4_DIR environment variable not set, checking standard locations.. \n""")
     if curl_incdir is None and curl_dir is not None:
         curl_incdir = os.path.join(curl_dir, 'include')
     if curl_incdir is not None and curl_libdir is not None:
-        libs.append('curl')
+        libs.append('libcurl')
         lib_dirs.append(curl_libdir)
         inc_dirs.append(curl_incdir)
+
+zlib_incdir=r'j:\dev\opt\zlib\include'
+zlib_libdir=r'j:\dev\opt\zlib\lib'
+inc_dirs.append(zlib_incdir)        
+lib_dirs.append(zlib_libdir)
+#extensions = [Extension("netCDF4",["netCDF4.c"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs,runtime_library_dirs=lib_dirs)]
+extensions = [Extension("netCDF4",["netCDF4.c"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs)]
 
 # Do not require numpy for just querying the package
 # Taken from the h5py setup file.
@@ -344,7 +351,7 @@ else:
 if has_cython and 'sdist' not in sys.argv[1:]:
     sys.stdout.write('using Cython to compile netCDF4.pyx...\n')
     # recompile netCDF4.pyx
-    extensions = [Extension("netCDF4",["netCDF4.pyx"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs,runtime_library_dirs=lib_dirs),
+    extensions = [Extension("netCDF4",["netCDF4.pyx"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs),
                   Extension('netcdftime._datetime', ['netcdftime/_datetime.pyx'])]
     # remove netCDF4.c file if it exists, so cython will recompile netCDF4.pyx.
     # run for build *and* install (issue #263). Otherwise 'pip install' will
@@ -376,7 +383,7 @@ if has_cython and 'sdist' not in sys.argv[1:]:
     cmdclass = {'build_ext': build_ext}
 else:
     # use existing netCDF4.c, don't need cython.
-    extensions = [Extension("netCDF4",["netCDF4.c"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs,runtime_library_dirs=lib_dirs),
+    extensions = [Extension("netCDF4",["netCDF4.c"],libraries=libs,library_dirs=lib_dirs,include_dirs=inc_dirs),
                   Extension('netcdftime._datetime', ['netcdftime/_datetime.c'])]
     cmdclass = {}
 
