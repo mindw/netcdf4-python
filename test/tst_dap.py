@@ -4,6 +4,7 @@ import netCDF4
 # test accessing data over http with opendap.
 
 URL = 'http://test.opendap.org/opendap/hyrax/data/nc/bears.nc'
+#URL = 'http://test.pydap.org/coads.nc'
 firstvarname = 'shot'
 firstvarmin = 2
 firstvarmax = 7
